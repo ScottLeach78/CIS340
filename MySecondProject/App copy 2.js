@@ -15,8 +15,7 @@ export default function MyApp() {
         I have a {pet}!
       </Text>
       
-    
-  );
+   );
 }
 
 
