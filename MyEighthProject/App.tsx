@@ -1,10 +1,52 @@
 import React, {useState} from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import * as ImagePicker from 'expo-image-picker' //import image picker
+import * SHaring from 'expo-sharing'//import image sharing
 
 export default function App() {
 
-  const [count, setcount] = useState(0);
-  const onTap = () => setcount(count => count + 1);
+  const[selectedImage, setSelectedImage] = React.useState(null)
+
+  let openImagePickerAsync = async () => {
+    let permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
+    
+    if (permissionResult.granted === false){
+
+      alert("Permission is required");
+      return;
+    }
+
+    let pickerResult = await ImagePicker.launchImageLibraryAsync();
+    
+    if (pickerResult.cancelled === true){
+      return;
+    }
+
+    setSelectedImage({localUri: pickerResult.uri});
+  };
+
+  let openSharingDialogAsync = async () => {
+    if (!(await SHaring.isAvailableAsync())){
+      alert('Sharing is not available');
+      return;
+    }
+
+    SHaring.shareAsync(selectedImage.localUri);
+  }
+
+  if (selectedImage !== null) {
+    return(
+      <View style={styles.container}>
+        <Image source={{uri: selectedImage.localUri}} style={styles.selImage} />
+      <TouchableOpacity onPress={openSharingDialogAsync} style={Styles.button}>
+        <Text style={StyleSheet.buttonText}> Share this Photo </Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+
+  
   return (
     <View style={styles.container}>
      <Image source={{uri: 'https://raw.githubusercontent.com/AbdunabiRamadan/CIS340/master/images/logo.png'}}
@@ -15,14 +57,14 @@ export default function App() {
       </Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => alert('You have not selected an image yet')} >
+        onPress={openImagePickerAsync} >
           <Text style={styles.buttonText}> Pick Image</Text>
 
 
       </TouchableOpacity>
     </View>
   );
-}
+
 
 const styles = StyleSheet.create({
   container: {
@@ -54,5 +96,10 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 20,
     color: "#87CEFA"
+  },
+  selImage: {
+    width: 300,
+    height: 300,
+    resize: 10
   }
 });

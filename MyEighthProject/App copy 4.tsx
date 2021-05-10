@@ -1,10 +1,24 @@
 import React, {useState} from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import * as ImagePicker from 'expo-image-picker'
 
 export default function App() {
 
-  const [count, setcount] = useState(0);
-  const onTap = () => setcount(count => count + 1);
+  let openImagePickerAsync = async () => {
+    let permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
+    
+    if (permissionResult.granted === false){
+
+      alert("Permission is required");
+      return;
+    }
+
+    let pickerResult = await ImagePicker.launchImageLibraryAsync();
+    console.log(pickerResult);
+  }
+
+
+  
   return (
     <View style={styles.container}>
      <Image source={{uri: 'https://raw.githubusercontent.com/AbdunabiRamadan/CIS340/master/images/logo.png'}}
@@ -15,14 +29,14 @@ export default function App() {
       </Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => alert('You have not selected an image yet')} >
+        onPress={openImagePickerAsync} >
           <Text style={styles.buttonText}> Pick Image</Text>
 
 
       </TouchableOpacity>
     </View>
   );
-}
+
 
 const styles = StyleSheet.create({
   container: {
